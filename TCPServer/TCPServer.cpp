@@ -42,7 +42,7 @@ using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 
 //最大接收数据长度
-#define BUFFER_SIZE 10240
+#define BUFFER_SIZE 3
 
 class TimeServerConnection : public TCPServerConnection
 	/// This class handles all client connections.
@@ -62,20 +62,37 @@ public:
 		app.logger().information("Request from " + this->socket().peerAddress().toString());
 		try
 		{
-			unsigned char* buffer = new unsigned char[BUFFER_SIZE];
+			char* buffer = new char[BUFFER_SIZE];
 			/// Returns the number of bytes received.
 			/// A return value of 0 means a graceful shutdown
 			/// of the connection from the peer.
+			
 			int n = socket().receiveBytes(buffer, BUFFER_SIZE);
-			buffer[n] = '\0';
 			std::cout << "Client Message: " << std::endl;
 			std::cout << n << std::endl;
-			std::cout << buffer << std::endl;
-			//Sleep(10000);
+			for (int i = 0; i < n; ++i) {
+				printf("%02x", buffer[i]);
+			}
+			printf("\n");
+			n = socket().receiveBytes(buffer, BUFFER_SIZE);
+			std::cout << "Client Message: " << std::endl;
+			std::cout << n << std::endl;
+			for (int i = 0; i < n; ++i) {
+				printf("%02x", buffer[i]);
+			}
+			printf("\n");
+			n = socket().receiveBytes(buffer, BUFFER_SIZE);
+			std::cout << "Client Message: " << std::endl;
+			std::cout << n << std::endl;
+			for (int i = 0; i < n; ++i) {
+				printf("%2x", buffer[i]);
+			}
+			printf("\n");
+
 			Timestamp now;
 			std::string dt(DateTimeFormatter::format(now, _format));
 			dt.append("\r\n");
-			std::string s2(65535,'a');
+			std::string s2(1024,'a');
 			dt.append(s2);
 			dt.append("bb\r\n");
 			socket().sendBytes(dt.data(), (int)dt.length());
